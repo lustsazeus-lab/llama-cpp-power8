@@ -1,65 +1,94 @@
-# Contributing to llama.cpp POWER8
+# Contributing to llama.cpp for IBM POWER8
 
-Thank you for your interest in contributing! This project provides POWER8-specific optimizations for llama.cpp.
+Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
 
-## How to Contribute
+## Prerequisites
 
-### Reporting Issues
+### Build Requirements
 
-- Use GitHub Issues for bug reports and feature requests
-- Include system details (POWER8 model, OS version, etc.)
-- For bugs: include steps to reproduce and any error messages
+- **Operating System**: Ubuntu 20.04 LTS (last POWER8-supported release)
+- **Compiler**: GCC with POWER8 support
+- **Build Tool**: CMake 3.14 or higher
+- **Hardware**: IBM POWER8 server (optional for development, required for testing)
 
-### Pull Requests
+### Required Compiler Flags
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/your-feature`
-3. **Make** your changes
-4. **Test** your changes if applicable
-5. **Commit** with clear messages: `git commit -m "Add: description"`
-6. **Push** to your fork: `git push origin feature/your-feature`
-7. **Submit** a Pull Request
-
-## Build Requirements
-
-### Hardware
-- IBM POWER8 server (Power System S824 recommended)
-- Ubuntu 20.04 LTS (last POWER8-supported release)
-
-### Software
-- GCC with POWER8 support
-- CMake 3.14+
-
-### Compiler Flags
 ```bash
 -mcpu=power8 -mvsx -maltivec -O3 -mtune=power8 -funroll-loops
 ```
 
-### Build Commands
+### Optional Dependencies
+
+- **IBM MASS Library**: For optimized math functions (`libmassvp8`, `libmass`)
+- **OpenMP**: Enabled via `-DGGML_OPENMP=ON`
+
+## Development Workflow
+
+### 1. Fork and Clone
+
 ```bash
+git clone https://github.com/YOUR_USERNAME/llama-cpp-power8
+cd llama-cpp-power8
+```
+
+### 2. Create a Branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 3. Make Changes
+
+Ensure your code follows the POWER8-specific requirements:
+- Use AltiVec/VSX intrinsics for vector operations
+- Test with `-mcpu=power8` compiler flags
+- Avoid x86_64-specific optimizations
+
+### 4. Build and Test
+
+```bash
+# Configure
 mkdir build && cd build
 cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DGGML_OPENMP=ON \
     -DCMAKE_C_FLAGS="-mcpu=power8 -mvsx -maltivec -O3 -mtune=power8 -funroll-loops" \
     -DCMAKE_CXX_FLAGS="-mcpu=power8 -mvsx -maltivec -O3 -mtune=power8 -funroll-loops"
+
+# Build
 make -j$(nproc)
+
+# Run benchmarks
+./altivec_benchmark
 ```
 
-## Testing
+### 5. Submit a Pull Request
 
-Test your changes on real POWER8 hardware. This project is specifically optimized for POWER8 architecture, so emulators or cross-compilation won't accurately validate performance changes.
+1. Push your branch to your fork
+2. Open a PR against the `main` branch
+3. Describe your changes and testing performed
+4. Wait for review
+
+## Testing Guidelines
+
+- Test on actual POWER8 hardware when possible
+- If you don't have POWER8 hardware, test compilation with cross-compilation tools
+- Include benchmark results comparing before/after changes
+- Verify no regressions in existing functionality
 
 ## Code Style
 
 - Follow existing code conventions in the project
 - Add comments for POWER8-specific optimizations
-- Include performance notes if applicable
+- Document any new build requirements
 
-## Recognition
+## Reporting Issues
 
-Contributors will be credited in the README and may earn RTC tokens via GitHub Issues bounties.
+- Use GitHub Issues for bug reports
+- Include system information (OS, hardware)
+- Provide reproduction steps
+- Attach relevant logs
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the project's license.
